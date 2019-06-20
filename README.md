@@ -14,3 +14,9 @@ Disclaimer :-) :
 Some tracks / artists will not be found because youtube's search api function is quite bad. 
 
 For example, type 'georg' and it will not return anything.
+
+Tech stuff:
+
+React with the Hooks API. There is no backend, authentication is done on the frontend using Google Sign-in.
+
+### This app does not store any of your data.
