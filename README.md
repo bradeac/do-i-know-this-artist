@@ -10,7 +10,7 @@ You have a song in mind and you want to listen to it. Some while ago, you found 
 
 
 Disclaimer :smiley::   
-Some tracks / artists will not be found because Youtube's api search function is pretty bad.  
+Some tracks / artists will not be found because Youtube's API search function is pretty, ehm, interesting, to put it that way.  
 For example, searching 'georg' will not return anything, but 'george' returns results.
 
 Tech stuff:  
