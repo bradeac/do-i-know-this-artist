@@ -5,13 +5,11 @@ import { UserContext } from '../../store/UserContext'
 
 import './Login.css'
 
-const customWindow = window
-
 const Login = () => {
     const { dispatch } = useContext(UserContext)
 
     useEffect(() => {
-        customWindow.gapi.signin2.render('google-signin-button', {
+        window.gapi.signin2.render('google-signin-button', {
             'longtitle': window.innerWidth > 768 ? true : false,
             'onsuccess': responseGoogle,
             'onfail': failureGoogle,
