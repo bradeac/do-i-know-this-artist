@@ -2,7 +2,7 @@
 
 #### If you're just like me and use Youtube for all your music needs by creating playlists for different genres of music, this app will come in handy :wink:
 
-Let's say you look at a festival line-up and some artist's name sounds familiar, but you're not quite sure. Just open the app, type in the name of the artist and see if you've saved tracks from that artist in one of your playlists !
+Let's say you look at a festival line-up and some artist's name sounds familiar, but you're not quite sure. Just open the app, type in the name of the artist and see if you've saved tracks from that artist in one of your Youtube playlists !
 
 OR
 
@@ -10,7 +10,7 @@ You have a song in mind and you want to listen to it. Some while ago, you found 
 
 
 Disclaimer :smiley::   
-Some tracks / artists will not be found because Youtube's api search function is pretty bad.  
+Some tracks / artists will not be found because Youtube's API search function is pretty, ehm, interesting, to put it that way.  
 For example, searching 'georg' will not return anything, but 'george' returns results.
 
 Tech stuff:  
