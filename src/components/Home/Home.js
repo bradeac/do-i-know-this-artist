@@ -76,6 +76,10 @@ const Home = () => {
                     />
                 </label>
 
+                {query.length > 2 && playlistsState.data.length === 0 &&
+                    <p>No results found. Maybe give a bit more details ?</p>
+                }
+
                 {query && playlistsState.data.map(playlist => (
                     <SearchResult
                         key={playlist.id.playlistId}
