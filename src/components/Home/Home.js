@@ -1,13 +1,14 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { Suspense, useEffect, useContext, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 import { apiKey, getChannelDataUrl, searchOptions, youtubeSearchUrl } from '../../config/environment'
 import { DataContext } from '../../store/DataContext'
 import { UserContext } from '../../store/UserContext'
-import SearchResult from '../SearchResult/SearchResult'
 
 import './Home.css'
+
+const SearchResult = React.lazy(() => import('../SearchResult/SearchResult')) 
 
 const Home = () => {
     const [ query, setQuery ] = useState('')
@@ -37,7 +38,7 @@ const Home = () => {
 
     useEffect(() => {
         async function search() {
-            if (query.length > 2) {
+            if (query.length > 1) {
                 const url = `${youtubeSearchUrl}${state.channelId}${searchOptions}${query}${apiKey}`
                 const response = await axios(url)
                 const results = response.data.items
@@ -77,16 +78,22 @@ const Home = () => {
                 </label>
 
                 {query.length > 2 && playlistsState.data.length === 0 &&
-                    <p>No results found. Maybe give a bit more details ?</p>
+                    <p>No results found. Maybe you should try the full word</p>
                 }
 
-                {query && playlistsState.data.map(playlist => (
-                    <SearchResult
-                        key={playlist.id.playlistId}
-                        playlist={playlist}
-                        query={query}
-                    />
-                ))}
+                <Suspense 
+                    fallback={
+                        <p>Fetching results ...</p>
+                    }
+                >
+                    {query.length > 1 && playlistsState.data.map(playlist => (
+                        <SearchResult
+                            key={playlist.id.playlistId}
+                            playlist={playlist}
+                            query={query}
+                        />
+                    ))}
+                </Suspense>
             </div>
         )
     }

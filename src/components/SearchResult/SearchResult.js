@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import axios from 'axios'
 
 import { apiKey, getTracksDataUrl } from '../../config/environment'
-import TrackCard from '../TrackCard/TrackCard'
+
+const TrackCard = React.lazy(() => import('../TrackCard/TrackCard'))
 
 const SearchResult = ({ playlist, query }) => {
     const [tracks, setTracks] = useState([])
@@ -37,12 +38,19 @@ const SearchResult = ({ playlist, query }) => {
         return (
             <>
                 <p>{playlist.snippet.title}</p>
-                {tracks.map(track => (
-                    <TrackCard
-                        key={track.id}
-                        data={track}
-                    />
-                ))}
+                
+                <Suspense
+                    fallback={
+                        <p>Fetching data ...</p>
+                    }
+                >
+                    {tracks.map(track => (
+                        <TrackCard
+                            key={track.id}
+                            data={track}
+                        />
+                    ))}
+                </Suspense>
             </>
         )
     }

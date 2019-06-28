@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route } from "react-router-dom"
 import dotenv from 'dotenv'
 
-import Home from './components/Home/Home'
-import Login from './components/Login/Login'
 import { DataProvider } from './store/DataContext'
 import { UserProvider } from './store/UserContext'
 
 import './index.css'
+
+const Home = React.lazy(() => import('./components/Home/Home'))
+const Login = React.lazy(() => import('./components/Login/Login'))
 
 dotenv.config()
 
@@ -16,8 +17,14 @@ ReactDOM.render(
     <UserProvider>
         <DataProvider>
             <Router>
-                <Route path="/login" component={Login} />
-                <Route path="/" component={Home} />
+                <Suspense
+                    fallback={
+                        <p>Loading ...</p>
+                    }
+                >
+                    <Route path="/login" component={Login} />
+                    <Route path="/" component={Home} />
+                </Suspense>
             </Router>        
         </DataProvider>
     </UserProvider>
