@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router } from "@reach/router"
+import { BrowserRouter as Router, Route } from "react-router-dom"
 import dotenv from 'dotenv'
 
 import Home from './components/Home/Home'
@@ -16,8 +16,8 @@ ReactDOM.render(
     <UserProvider>
         <DataProvider>
             <Router>
-                <Login path="/login" />
-                <Home path="/" />
+                <Route path="/login" component={Login} />
+                <Route path="/" component={Home} />
             </Router>        
         </DataProvider>
     </UserProvider>

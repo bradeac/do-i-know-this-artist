@@ -1,11 +1,10 @@
 import React, { useContext, useEffect } from 'react'
-import { navigate } from '@reach/router'
 
 import { UserContext } from '../../store/UserContext'
 
 import './Login.css'
 
-const Login = () => {
+const Login = ({ history }) => {
     const { dispatch } = useContext(UserContext)
 
     useEffect(() => {
@@ -14,7 +13,7 @@ const Login = () => {
     
             dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: true })
     
-            navigate('/')
+            history.push('/')
         }
     
         const failureGoogle = error => {
@@ -22,7 +21,7 @@ const Login = () => {
     
             dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: false })
     
-            navigate('/login')
+            history.push('/login')
         }
 
         window.gapi.signin2.render('google-signin-button', {
@@ -33,7 +32,7 @@ const Login = () => {
             'theme': 'light',
             'width': window.innerWidth > 768 ? 200 : 100,
         })
-    }, [dispatch])
+    }, [dispatch, history])
 
 
     return (

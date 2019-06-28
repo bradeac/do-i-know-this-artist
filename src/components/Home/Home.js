@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react'
-import { navigate } from '@reach/router'
+import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 import { apiKey, getChannelDataUrl, searchOptions, youtubeSearchUrl } from '../../config/environment'
@@ -91,9 +91,9 @@ const Home = () => {
         )
     }
     
-    navigate('/login')
-
-    return null
+    return (
+        <Redirect to='/login'/>
+    )
 }
 
 export default Home
