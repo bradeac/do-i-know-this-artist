@@ -16,9 +16,9 @@ const SearchResult = ({ playlist, query }) => {
             while (response.nextPagetoken) {
                 url = `${getTracksDataUrl}${playlist.id.playlistId}&pageToken=${response.nextPagetoken}&${apiKey}`
 
-                const response = await axios(url)
+                const nextResponse = await axios(url)
 
-                tracks = [ tracks, ...response.data.items ]
+                tracks = [ tracks, ...nextResponse.data.items ]
             }
 
             const filteredTracks = tracks.filter(track =>
@@ -31,7 +31,7 @@ const SearchResult = ({ playlist, query }) => {
         }
 
         findTracks()
-    }, [])
+    }, [playlist, query])
 
     if (tracks.length > 0) {
         return (

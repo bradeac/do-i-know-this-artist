@@ -33,7 +33,7 @@ const Home = () => {
             dispatch({ type: 'SET_PLAYLISTS', playlistsState: [] })
             dispatch({ type: 'SET_CHANNEL_ID', channelId: '' })
         }
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         async function search() {
@@ -51,7 +51,7 @@ const Home = () => {
         return () => {
             dispatch({ type: 'SET_PLAYLISTS', playlistsState: [] })
         }
-    }, [query])
+    }, [dispatch, dispatchPlaylists, state.channelId, query])
 
     const handleInputChange = (e) => {
         if (e.target.value.length === 0) {

@@ -9,6 +9,22 @@ const Login = () => {
     const { dispatch } = useContext(UserContext)
 
     useEffect(() => {
+        const responseGoogle = user => {
+            localStorage.setItem('DIKTA_TOKEN', user.Zi.access_token)
+    
+            dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: true })
+    
+            navigate('/')
+        }
+    
+        const failureGoogle = error => {
+            localStorage.clear()
+    
+            dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: false })
+    
+            navigate('/login')
+        }
+
         window.gapi.signin2.render('google-signin-button', {
             'longtitle': window.innerWidth > 768 ? true : false,
             'onsuccess': responseGoogle,
@@ -17,23 +33,8 @@ const Login = () => {
             'theme': 'light',
             'width': window.innerWidth > 768 ? 200 : 100,
         })
-    }, [])
+    }, [dispatch])
 
-    const responseGoogle = user => {
-        localStorage.setItem('DIKTA_TOKEN', user.Zi.access_token)
-
-        dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: true })
-
-        navigate('/')
-    }
-
-    const failureGoogle = error => {
-        localStorage.clear()
-
-        dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: false })
-
-        navigate('/login')
-    }
 
     return (
         <div className="login">
