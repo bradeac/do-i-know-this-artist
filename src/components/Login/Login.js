@@ -10,6 +10,7 @@ const Login = ({ history }) => {
     useEffect(() => {
         const responseGoogle = user => {
             localStorage.setItem('DIKTA_TOKEN', user.Zi.access_token)
+            localStorage.setItem('DIKTA_PROFILE_PIC', user.w3.Paa)
     
             dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: true })
     
