@@ -11,6 +11,8 @@ import './Home.css'
 const SearchResult = React.lazy(() => import('../SearchResult/SearchResult')) 
 
 const Home = () => {
+    const textInput = React.createRef()
+
     const [ query, setQuery ] = useState('')
     const { state, dispatch } = useContext(UserContext)
     const { playlistsState, dispatchPlaylists } = useContext(DataContext)
@@ -18,11 +20,20 @@ const Home = () => {
     useEffect(() => {
         async function getChannelId() {
             const Authorization = `Bearer ${localStorage.getItem('DIKTA_TOKEN')}`
-            const response = await axios(getChannelDataUrl, {
+            let response = await axios(getChannelDataUrl, {
                 headers: { Authorization }
             })
+
+            if (response.code === 401) {
+                setTimeout(async () => {
+                    response = await axios(getChannelDataUrl, {
+                        headers: { Authorization }
+                    })
+                }, 3000)
+            }
+
             const channelId = response.data.items[0].id
-            
+
             dispatch({ type: 'SET_CHANNEL_ID', channelId })
         }
 
@@ -54,47 +65,65 @@ const Home = () => {
         }
     }, [dispatch, dispatchPlaylists, state.channelId, query])
 
-    const handleInputChange = (e) => {
-        if (e.target.value.length === 0) {
-            dispatchPlaylists({ type: 'SET_PLAYLISTS', playlistsState: [] })
+    const handleClick = (e) => {
+        const code = e.keyCode || e.which
+
+        if (code === 13) {
+            if (textInput.current.value.length === 0) {
+                dispatchPlaylists({ type: 'SET_PLAYLISTS', playlistsState: [] })
+            }
+            
+            setQuery(textInput.current.value)
         }
-        
-        setQuery(e.target.value)
     }
 
     if (state.isLoggedIn) {
+        const channelUrl = `https://www.youtube.com/channel/${state.channelId}/playlists`
+
         return (
-            <div className="home">
-                <p>
-                    {'ChannelId: ' + state.channelId}
-                </p>
-
-                <label>
-                    <input 
-                        placeholder="Search ..."
-                        value={query}
-                        onChange={handleInputChange}
+            <main className="home">
+                <a href={channelUrl}>
+                    <img
+                        alt="Link to your Youtube channel"
+                        className="profile-pic"
+                        src={localStorage.getItem('DIKTA_PROFILE_PIC')}
                     />
-                </label>
-
-                {query.length > 2 && playlistsState.data.length === 0 &&
-                    <p>No results found. Maybe you should try the full word</p>
-                }
-
-                <Suspense 
-                    fallback={
-                        <p>Fetching results ...</p>
-                    }
-                >
-                    {query.length > 1 && playlistsState.data.map(playlist => (
-                        <SearchResult
-                            key={playlist.id.playlistId}
-                            playlist={playlist}
-                            query={query}
+                </a>
+                <section className="section">
+                    <section className="input-container">
+                        <input
+                            className="input"
+                            onKeyPress={handleClick}
+                            placeholder="Search ..."
+                            ref={textInput}
                         />
-                    ))}
-                </Suspense>
-            </div>
+                        <button
+                            className="button-search"
+                            onClick={handleClick}                        
+                        >
+                                Search
+                        </button>
+                    </section>
+
+                    {query.length > 2 && playlistsState.data.length === 0 &&
+                        <p>No results found. Maybe you should try the full word</p>
+                    }
+
+                    <Suspense 
+                        fallback={
+                            <p>Fetching results ...</p>
+                        }
+                    >
+                        {query.length > 1 && playlistsState.data.map(playlist => (
+                            <SearchResult
+                                key={playlist.id.playlistId}
+                                playlist={playlist}
+                                query={query}
+                            />
+                        ))}
+                    </Suspense>
+                </section>
+            </main>
         )
     }
     
