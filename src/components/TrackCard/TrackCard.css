@@ -1,0 +1,57 @@
+.card-container {
+    position: relative;
+    display: flex;
+}
+
+.card {
+    width: 100%;
+
+    text-decoration: none;
+}
+
+.info {
+    width: 100%;
+
+    display: inline-grid;
+    grid-template-columns: 8rem 1fr;
+    grid-template-rows: 4.5rem 2px;
+    grid-column-gap: .5rem;
+    grid-row-gap: 1rem;
+}
+
+.left {
+    align-self: center;   
+    text-align: center;
+}
+    
+.playlist-position {
+    display: none;
+    
+    z-index: 2;
+}
+    
+.thumb-wrapper {                  
+    width: 8rem;
+    height: 4.5rem;
+    
+    margin-right: .5rem;
+}
+    
+.meta {
+    display: flex;
+    flex-direction: column;       
+
+    margin-left: .5rem;
+}
+    
+.title {
+    overflow: hidden;
+    max-height: 4rem;
+
+    margin-bottom: 1rem;
+
+    color: white;
+    font-weight: bold;
+    font-size: .75rem;
+    line-height: 1rem;
+}
