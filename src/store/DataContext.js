@@ -3,23 +3,23 @@ import React from 'react'
 let reducer = (state, action) => {
     switch(action.type) {
         case 'SET_PLAYLISTS':
-            return { ...state, data: action.playlistsState }
+            return { ...state, playlists: action.playlists }
         default:
             return state
     }
 }
 
 const initialState = {
-    data: [],
+    playlists: [],
 }
 
 const DataContext = React.createContext(null)
 
 function DataProvider(props) {
-    const [playlistsState, dispatchPlaylists] = React.useReducer(reducer, initialState)
+    const [dataStore, dispatchData] = React.useReducer(reducer, initialState)
 
     return (
-        <DataContext.Provider value={{ playlistsState, dispatchPlaylists }}>
+        <DataContext.Provider value={{ dataStore, dispatchData }}>
             {props.children}
         </DataContext.Provider>
     )

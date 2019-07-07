@@ -7,6 +7,8 @@ let reducer = (state, action) => {
             return { ...state, channelId: action.channelId }
         case 'SET_IS_LOGGED_IN':
             return { ...state, isLoggedIn: action.isLoggedIn }
+        case 'SET_PROFILE_PIC_URL':
+            return { ...state, profilePicUrl: action.profilePicUrl }
         default:
             return state
     }
@@ -15,15 +17,16 @@ let reducer = (state, action) => {
 const initialState = {
     channelId: null,
     isLoggedIn: false,
+    profilePicUrl: null,
 }
 
 const UserContext = React.createContext(null)   
 
 function UserProvider(props) {    
-    const [state, dispatch] = React.useReducer(reducer, initialState)
+    const [userStore, dispatch] = React.useReducer(reducer, initialState)
     
     return (
-        <UserContext.Provider value={{ state, dispatch }}>
+        <UserContext.Provider value={{ userStore, dispatch }}>
             {props.children}
         </UserContext.Provider>
     )
