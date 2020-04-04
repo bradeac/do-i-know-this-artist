@@ -17,7 +17,7 @@ const Auth = () => {
         
         if (Object.entries(response).length !== 0) {    
             dispatch({ type: 'SET_IS_LOGGED_IN', isLoggedIn: true })
-            dispatch({ type: 'SET_PROFILE_PIC_URL', profilePicUrl: response.w3.Paa })
+            dispatch({ type: 'SET_PROFILE_PIC_URL', profilePicUrl: response.Qt.UK })
         }
     }, [dispatch, response, userStore])
 
@@ -28,7 +28,7 @@ const Auth = () => {
                     <p className="login">Loading ...</p>
                 }
             >
-                <Home token={response.Zi.access_token}/>
+                <Home token={response.uc.access_token}/>
             </Suspense>
         )
     }
