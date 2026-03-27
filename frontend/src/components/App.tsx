@@ -97,7 +97,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center px-4 py-12">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center px-4 py-12 pb-24">
       <div className="w-full max-w-xl flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold">Do I Know This Artist?</h1>
         {isSignedIn && (
@@ -163,6 +163,12 @@ export default function App() {
         selectedIds={selectedPlaylistIds}
         onSelectionChange={handleSelectionChange}
       />
+
+      <footer className="fixed bottom-0 left-0 right-0 bg-gray-950 border-t border-gray-800 py-3 text-center text-sm text-gray-500">
+        <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">bradeac.dev</a>
+        <span className="mx-2">·</span>
+        <span>Check out also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">music.bradeac.dev</a></span>
+      </footer>
     </div>
   )
 }
