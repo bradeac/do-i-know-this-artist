@@ -20,7 +20,7 @@ export function initGoogleAuth(clientId: string, onSuccess: (accessToken: string
 
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: clientId,
-        scope: 'https://www.googleapis.com/auth/youtube.readonly',
+        scope: 'https://www.googleapis.com/auth/youtube.readonly openid profile email',
         callback: async (response: any) => {
           if (response.access_token) {
             // Fetch user info

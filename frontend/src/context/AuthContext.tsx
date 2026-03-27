@@ -67,6 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const previousUser = loadUser()
+    const cachedToken = loadToken()
+
+    // If we have a token but no user info, fetch it
+    if (cachedToken && !previousUser) {
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${cachedToken}` },
+      })
+        .then((r) => r.json())
+        .then((info) => {
+          const userInfo: GoogleUser = { name: info.name || '', email: info.email || '', picture: info.picture || '' }
+          setUser(userInfo)
+          localStorage.setItem(USER_KEY, JSON.stringify(userInfo))
+        })
+        .catch(() => {}) // token might be invalid, user will need to re-sign in
+    }
 
     initGoogleAuth(clientId, (token, userInfo, expiresIn) => {
       setAccessToken(token)
