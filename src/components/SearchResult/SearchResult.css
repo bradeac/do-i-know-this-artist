@@ -1,9 +1,0 @@
-.tracks {
-    display: flex;
-    flex-direction: column;
-}
-
-.playlist-title {
-    color: white;
-    text-decoration: none;
-}
