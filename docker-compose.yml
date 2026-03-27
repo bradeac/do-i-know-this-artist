@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    container_name: dikta-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    container_name: dikta-frontend
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
