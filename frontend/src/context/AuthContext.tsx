@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { initGoogleAuth, requestAccessToken, GoogleUser } from '../auth/google'
+import { initGoogleAuth, requestAccessToken } from '../auth/google'
+import type { GoogleUser } from '../auth/google'
 
 interface AuthState {
   isSignedIn: boolean

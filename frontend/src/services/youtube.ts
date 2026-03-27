@@ -1,4 +1,4 @@
-import { MusicProvider, Playlist, Track } from './types'
+import type { MusicProvider, Playlist, Track } from './types'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
