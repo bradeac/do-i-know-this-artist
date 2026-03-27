@@ -11,13 +11,22 @@ router.get('/playlists', async (req, res) => {
 
   try {
     const apiKey = process.env.YOUTUBE_API_KEY
-    const url = `${YOUTUBE_API_BASE}/playlists?mine=true&part=snippet,contentDetails&maxResults=50&key=${apiKey}`
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    const data = await response.json()
-    if (!response.ok) return res.status(response.status).json(data)
-    res.json(data)
+    let allItems: any[] = []
+    let pageToken = ''
+
+    do {
+      const tokenParam = pageToken ? `&pageToken=${pageToken}` : ''
+      const url = `${YOUTUBE_API_BASE}/playlists?mine=true&part=snippet,contentDetails&maxResults=50&key=${apiKey}${tokenParam}`
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      const data = await response.json()
+      if (!response.ok) return res.status(response.status).json(data)
+      allItems = allItems.concat(data.items || [])
+      pageToken = data.nextPageToken || ''
+    } while (pageToken)
+
+    res.json({ items: allItems })
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch playlists' })
   }
