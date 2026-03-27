@@ -29,8 +29,9 @@ describe('App', () => {
       signIn: vi.fn(),
       isLoading: true,
     })
-    render(<App />)
-    expect(screen.getByText(/loading/i)).toBeInTheDocument()
+    const { container } = render(<App />)
+    // Loading state shows vinyl spinner SVG
+    expect(container.querySelector('svg')).toBeInTheDocument()
   })
 
   it('shows sign-in button when not signed in', () => {

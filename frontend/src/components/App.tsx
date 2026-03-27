@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useAuth } from '../context/AuthContext'
 import { youtubeProvider } from '../services/youtube'
 import type { Track, Playlist } from '../services/types'
@@ -21,36 +22,93 @@ function saveSelectedIds(ids: string[]) {
   localStorage.setItem(SELECTED_PLAYLISTS_KEY, JSON.stringify(ids))
 }
 
+function delay(ms: number) {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+function VinylIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+      <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
+      <circle cx="50" cy="50" r="28" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
+      <circle cx="50" cy="50" r="15" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+      <circle cx="50" cy="50" r="4" fill="currentColor" opacity="0.4" />
+    </svg>
+  )
+}
+
 export default function App() {
   const { isSignedIn, accessToken, user, signIn, isLoading: authLoading } = useAuth()
   const [tracks, setTracks] = useState<Track[]>([])
-  const [isSearching, setIsSearching] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>([])
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [playlistsLoading, setPlaylistsLoading] = useState(false)
+  const [loadingProgress, setLoadingProgress] = useState('')
+  const [isReady, setIsReady] = useState(false)
 
+  // Cache: all tracks per playlist, keyed by playlist id
+  const trackCache = useRef<Map<string, Track[]>>(new Map())
+
+  // Fetch playlists + all tracks on sign-in
   useEffect(() => {
     if (!isSignedIn || !accessToken) return
 
-    setPlaylistsLoading(true)
-    youtubeProvider.getPlaylists(accessToken).then((fetched) => {
-      setPlaylists(fetched)
-      const saved = loadSelectedIds()
-      if (saved) {
-        // Only keep IDs that still exist
-        setSelectedPlaylistIds(saved.filter((id) => fetched.some((p) => p.id === id)))
-      } else {
-        // Default: all selected
-        setSelectedPlaylistIds(fetched.map((p) => p.id))
+    let cancelled = false
+
+    async function loadEverything() {
+      try {
+        setLoadingProgress('Loading playlists...')
+        const fetched = await youtubeProvider.getPlaylists(accessToken!)
+        if (cancelled) return
+
+        setPlaylists(fetched)
+        const saved = loadSelectedIds()
+        const selectedIds = saved
+          ? saved.filter((id) => fetched.some((p) => p.id === id))
+          : fetched.map((p) => p.id)
+        setSelectedPlaylistIds(selectedIds)
+
+        // Fetch tracks for all playlists with delay to avoid rate limiting
+        for (let i = 0; i < fetched.length; i++) {
+          if (cancelled) return
+          const playlist = fetched[i]
+          setLoadingProgress(`Loading tracks: ${playlist.title} (${i + 1}/${fetched.length})`)
+
+          try {
+            const playlistTracks = await youtubeProvider.getTracks(playlist.id, accessToken!)
+            trackCache.current.set(playlist.id, playlistTracks.map((t) => ({ ...t, playlistName: playlist.title })))
+          } catch {
+            // Skip playlists that fail, don't break the whole load
+            trackCache.current.set(playlist.id, [])
+          }
+
+          // Small delay between requests to avoid rate limiting
+          if (i < fetched.length - 1) {
+            await delay(200)
+          }
+        }
+
+        if (!cancelled) {
+          setIsReady(true)
+          setLoadingProgress('')
+          // Show settings on first login so user can pick playlists
+          if (!saved) {
+            setSettingsOpen(true)
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load data')
+          setLoadingProgress('')
+        }
       }
-    }).catch((err) => {
-      setError(err instanceof Error ? err.message : 'Failed to load playlists')
-    }).finally(() => {
-      setPlaylistsLoading(false)
-    })
+    }
+
+    loadEverything()
+    return () => { cancelled = true }
   }, [isSignedIn, accessToken])
 
   const handleSelectionChange = (ids: string[]) => {
@@ -60,101 +118,145 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-gray-400">Loading...</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <VinylIcon className="w-16 h-16 text-amber-warm vinyl-spin" />
       </div>
     )
   }
 
-  const handleSearch = async (query: string) => {
-    if (!accessToken) return
-    setIsSearching(true)
-    setError(null)
-    setTracks([])
+  const handleSearch = (query: string) => {
     setHasSearched(true)
+    setError(null)
 
-    try {
-      const allTracks: Track[] = []
-      const toSearch = playlists.filter((p) => selectedPlaylistIds.includes(p.id))
+    const q = query.toLowerCase()
+    const results: Track[] = []
 
-      for (const playlist of toSearch) {
-        const playlistTracks = await youtubeProvider.getTracks(playlist.id, accessToken)
-        const matched = playlistTracks
-          .filter((t) => {
-            const q = query.toLowerCase()
-            return t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
-          })
-          .map((t) => ({ ...t, playlistName: playlist.title }))
-        allTracks.push(...matched)
-      }
-
-      setTracks(allTracks)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setIsSearching(false)
+    for (const playlistId of selectedPlaylistIds) {
+      const cached = trackCache.current.get(playlistId)
+      if (!cached) continue
+      const matched = cached.filter(
+        (t) => t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
+      )
+      results.push(...matched)
     }
+
+    setTracks(results)
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center px-4 py-12 pb-24">
-      <div className="w-full max-w-xl flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold">Do I Know This Artist?</h1>
-        {isSignedIn && (
-          <button
-            onClick={() => setSettingsOpen(true)}
-            className="text-gray-400 hover:text-white transition-colors"
-            aria-label="Settings"
+    <div className="min-h-screen bg-surface flex flex-col">
+      {/* Header */}
+      <header className="w-full border-b border-border-subtle">
+        <div className="max-w-2xl mx-auto w-full px-8 py-5 flex items-center justify-between">
+          <motion.h1
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="font-display text-2xl tracking-wider text-text-primary uppercase"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-            </svg>
-          </button>
-        )}
-      </div>
+            Do I Know This Artist?
+          </motion.h1>
 
-      {!isSignedIn ? (
-        <div className="mt-8">
-          <p className="text-gray-400 mb-4 text-center">
-            Search your YouTube playlists by artist or track name.
-          </p>
-          <button
-            onClick={signIn}
-            className="px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Sign in with Google
-          </button>
+          {isSignedIn && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-4"
+            >
+              <span className="text-text-muted text-xs hidden sm:inline">{user?.name}</span>
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="text-text-muted hover:text-amber-warm transition-colors p-2 rounded-lg hover:bg-surface-raised"
+                aria-label="Settings"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                </svg>
+              </button>
+            </motion.div>
+          )}
         </div>
-      ) : (
-        <>
-          <p className="text-gray-400 mb-6">
-            Signed in as <span className="text-white">{user?.name}</span>
-          </p>
+      </header>
 
-          {playlistsLoading ? (
-            <p className="text-gray-400">Loading playlists...</p>
+      {/* Main content */}
+      <main className="flex-1 w-full max-w-2xl mx-auto px-8 py-10 pb-28">
+        <AnimatePresence mode="wait">
+          {!isSignedIn ? (
+            <motion.div
+              key="login"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center pt-24"
+            >
+              <VinylIcon className="w-20 h-20 text-amber-dim mb-8" />
+              <p className="text-text-secondary text-center max-w-sm mb-10 font-light leading-relaxed">
+                Search across your YouTube playlists to find if you already know an artist or track.
+              </p>
+              <button
+                onClick={signIn}
+                className="px-8 py-3.5 bg-amber-warm text-surface font-medium rounded-xl hover:bg-amber-glow transition-all duration-300 text-sm tracking-wide uppercase"
+              >
+                Sign in with Google
+              </button>
+            </motion.div>
+          ) : !isReady ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center pt-24"
+            >
+              <VinylIcon className="w-14 h-14 text-amber-warm vinyl-spin mb-4" />
+              <p className="text-text-secondary text-sm">{loadingProgress}</p>
+            </motion.div>
           ) : (
-            <>
-              <SearchBar onSearch={handleSearch} isLoading={isSearching} />
-
-              {isSearching && (
-                <p className="mt-6 text-gray-400">Searching your playlists...</p>
-              )}
+            <motion.div
+              key="search"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <SearchBar onSearch={handleSearch} isLoading={false} />
 
               {error && (
-                <p className="mt-6 text-red-400">{error}</p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-6 text-red-400/80 text-sm"
+                >
+                  {error}
+                </motion.p>
               )}
 
-              {hasSearched && !isSearching && !error && (
-                <div className="mt-6 w-full flex justify-center">
+              {hasSearched && (
+                <div className="mt-8">
+                  {tracks.length > 0 && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-text-muted text-xs mb-6 tracking-wide uppercase"
+                    >
+                      {tracks.length} {tracks.length === 1 ? 'result' : 'results'} found
+                    </motion.p>
+                  )}
                   <TrackList tracks={tracks} />
                 </div>
               )}
-            </>
+            </motion.div>
           )}
-        </>
-      )}
+        </AnimatePresence>
+      </main>
+
+      {/* Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-sm border-t border-border-subtle py-3 text-center text-xs text-text-muted">
+        <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">bradeac.dev</a>
+        <span className="mx-2 text-border-warm">/</span>
+        <span>Check out also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
+      </footer>
 
       <SettingsModal
         isOpen={settingsOpen}
@@ -163,12 +265,6 @@ export default function App() {
         selectedIds={selectedPlaylistIds}
         onSelectionChange={handleSelectionChange}
       />
-
-      <footer className="fixed bottom-0 left-0 right-0 bg-gray-950 border-t border-gray-800 py-3 text-center text-sm text-gray-500">
-        <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">bradeac.dev</a>
-        <span className="mx-2">·</span>
-        <span>Check out also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">music.bradeac.dev</a></span>
-      </footer>
     </div>
   )
 }

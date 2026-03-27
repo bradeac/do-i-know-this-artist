@@ -14,23 +14,23 @@ const mockTrack: Track = {
 
 describe('TrackCard', () => {
   it('renders track title', () => {
-    render(<TrackCard track={mockTrack} />)
+    render(<TrackCard track={mockTrack} index={0} />)
     expect(screen.getByText('Karma Police')).toBeInTheDocument()
   })
 
   it('renders artist name', () => {
-    render(<TrackCard track={mockTrack} />)
+    render(<TrackCard track={mockTrack} index={0} />)
     expect(screen.getByText('Radiohead')).toBeInTheDocument()
   })
 
   it('renders thumbnail image', () => {
-    render(<TrackCard track={mockTrack} />)
+    render(<TrackCard track={mockTrack} index={0} />)
     const img = screen.getByRole('img')
     expect(img).toHaveAttribute('src', mockTrack.thumbnail)
   })
 
   it('renders a link to the YouTube video', () => {
-    render(<TrackCard track={mockTrack} />)
+    render(<TrackCard track={mockTrack} index={0} />)
     const link = screen.getByRole('link')
     expect(link).toHaveAttribute('href', mockTrack.url)
     expect(link).toHaveAttribute('target', '_blank')
