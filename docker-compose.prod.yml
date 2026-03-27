@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     image: dikta-backend:latest
     ports:
-      - "5001:5000"
+      - "5177:5000"
     container_name: dikta-backend
     restart: unless-stopped
     env_file:
@@ -30,7 +28,7 @@ services:
       dockerfile: Dockerfile.prod
     image: dikta-frontend:latest
     ports:
-      - "5175:5173"
+      - "5176:5173"
     container_name: dikta-frontend
     depends_on:
       - backend
