@@ -14,7 +14,7 @@ docker save dikta-frontend:latest | gzip > frontend.tar.gz
 
 echo "Uploading to VPS..."
 ssh h "mkdir -p /root/dikta"
-scp backend.tar.gz frontend.tar.gz docker-compose.prod.yml .env h:/root/dikta/
+scp backend.tar.gz frontend.tar.gz docker-compose.prod.yml backend/.env h:/root/dikta/
 
 echo "Deploying..."
 ssh h << 'ENDSSH'

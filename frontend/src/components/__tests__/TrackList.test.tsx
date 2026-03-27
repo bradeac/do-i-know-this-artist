@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import TrackList from '../TrackList'
-import { Track } from '../../services/types'
+import type { Track } from '../../services/types'
 
 const mockTracks: Track[] = [
   {

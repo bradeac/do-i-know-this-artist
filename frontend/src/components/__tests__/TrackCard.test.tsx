@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import TrackCard from '../TrackCard'
-import { Track } from '../../services/types'
+import type { Track } from '../../services/types'
 
 const mockTrack: Track = {
   id: 'abc123',
