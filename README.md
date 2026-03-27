@@ -1,20 +1,48 @@
-# do-i-know-this-artist
+# Do I Know This Artist?
 
-#### If you're just like me and use Youtube for all your music needs by creating playlists for different genres of music, this app will come in handy :wink:
+Search your YouTube playlists to find if you already know an artist or track.
 
-Let's say you look at a festival line-up and some artist's name sounds familiar, but you're not quite sure. Just open the app, type in the name of the artist and see if you've saved tracks from that artist in one of your Youtube playlists !
+See a name on a festival lineup that sounds familiar? Search across all your YouTube playlists instantly.
 
-OR
+**[do-i-know-this-artist.bradeac.dev](https://do-i-know-this-artist.bradeac.dev)**
 
-You have a song in mind and you want to listen to it. Some while ago, you found a HQ version of it on Youtube and saved it into a playlist, but you're not quite sure what playlist. Open the app, type in the artist or the track name and you'll find immediately in which playlists it is saved.
+## How it works
 
+1. Sign in with Google
+2. The app caches all tracks from your YouTube playlists
+3. Search by artist or track name — results are instant
 
-Disclaimer :smiley::   
-Some tracks / artists will not be found because Youtube's API search function is pretty, ehm, interesting, to put it that way.  
-For example, searching 'georg' will not return anything, but 'george' returns results.
+You can choose which playlists to include via the settings panel.
 
-Tech stuff:  
-- React with the Hooks API
-- there is no backend, authentication is done on the frontend using Google Sign-in
+## Running locally
 
-### This app does not store any of your data :relieved:
+```
+cp backend/.env.example backend/.env  # add your YOUTUBE_API_KEY
+cp frontend/.env.example frontend/.env  # add your VITE_GOOGLE_CLIENT_ID
+
+docker compose up
+```
+
+Frontend: `localhost:5176` | Backend: `localhost:5177`
+
+## Deploy
+
+The deploy script uses `h` as the SSH host alias. Add it to your `~/.ssh/config`:
+
+```
+Host h
+  HostName <your-vps-ip>
+  User root
+```
+
+Then run:
+
+```
+bash deploy.sh
+```
+
+Builds for linux/amd64, uploads images to VPS, runs with docker compose.
+
+## Privacy
+
+No data is stored on the server. Auth tokens and preferences live in your browser's localStorage. [Privacy policy](https://do-i-know-this-artist.bradeac.dev/privacy).

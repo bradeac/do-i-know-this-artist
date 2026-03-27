@@ -256,6 +256,10 @@ export default function App() {
         <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">bradeac.dev</a>
         <span className="mx-2 text-border-warm">/</span>
         <span>Check out also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
+        <span className="mx-2 text-border-warm">/</span>
+        <a href="/privacy" className="hover:text-amber-warm transition-colors duration-200">Privacy</a>
+        <span className="mx-2 text-border-warm">/</span>
+        <a href="/terms" className="hover:text-amber-warm transition-colors duration-200">Terms</a>
       </footer>
 
       <SettingsModal
