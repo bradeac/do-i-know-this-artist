@@ -10,7 +10,7 @@ interface TokenClient {
 
 let tokenClient: TokenClient | null = null
 
-export function initGoogleAuth(clientId: string, onSuccess: (accessToken: string, user: GoogleUser) => void): Promise<void> {
+export function initGoogleAuth(clientId: string, onSuccess: (accessToken: string, user: GoogleUser, expiresIn: number) => void): Promise<void> {
   return new Promise((resolve) => {
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
@@ -32,7 +32,7 @@ export function initGoogleAuth(clientId: string, onSuccess: (accessToken: string
               name: userInfo.name || '',
               email: userInfo.email || '',
               picture: userInfo.picture || '',
-            })
+            }, response.expires_in || 3600)
           }
         },
       })
