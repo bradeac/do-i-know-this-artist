@@ -76,7 +76,7 @@ describe('youtubeProvider', () => {
         title: 'Song Name',
         artist: 'Artist',
         thumbnail: 'http://thumb.jpg',
-        url: 'https://www.youtube.com/watch?v=abc123',
+        url: 'https://music.youtube.com/watch?v=abc123',
         playlistName: '',
       }])
     })

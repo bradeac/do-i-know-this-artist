@@ -26,7 +26,7 @@ export const youtubeProvider: MusicProvider = {
       title: item.snippet?.title || '',
       artist: item.snippet?.videoOwnerChannelTitle || '',
       thumbnail: item.snippet?.thumbnails?.default?.url || '',
-      url: `https://www.youtube.com/watch?v=${item.snippet?.resourceId?.videoId || item.id}`,
+      url: `https://music.youtube.com/watch?v=${item.snippet?.resourceId?.videoId || item.id}`,
       playlistName: '',
     }))
   },
