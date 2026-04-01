@@ -197,7 +197,7 @@ export default function App() {
               </p>
               <button
                 onClick={signIn}
-                className="px-8 py-3.5 bg-amber-warm text-surface font-medium rounded-xl hover:bg-amber-glow transition-all duration-300 text-sm tracking-wide uppercase"
+                className="px-8 py-3.5 bg-amber-warm text-black font-medium rounded-xl hover:bg-amber-glow transition-all duration-300 text-sm tracking-wide uppercase"
               >
                 Sign in with Google
               </button>
