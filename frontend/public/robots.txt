@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://do-i-know-this-artist.bradeac.dev/sitemap.xml
