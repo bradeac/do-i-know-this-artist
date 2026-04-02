@@ -252,10 +252,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-sm border-t border-border-subtle py-3 text-center text-xs text-text-muted">
-        <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">bradeac.dev</a>
+      <footer className="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-sm border-t border-border-subtle py-3 text-center text-xs text-text-secondary">
+        <span>Built by </span><a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">bradeac.dev</a>
         <span className="mx-2 text-border-warm">/</span>
-        <span>Check out also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
+        <span>For more features, try also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
         <span className="mx-2 text-border-warm">/</span>
         <a href="/privacy" className="hover:text-amber-warm transition-colors duration-200">Privacy</a>
         <span className="mx-2 text-border-warm">/</span>

@@ -89,10 +89,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       saveAuth(token, userInfo, expiresIn)
     }).then(() => {
       setIsLoading(false)
-      // User was previously signed in but token expired — silently get a new one
-      if (previousUser && !loadToken()) {
-        requestAccessToken()
-      }
     })
   }, [])
 
