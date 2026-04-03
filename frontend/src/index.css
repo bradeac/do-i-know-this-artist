@@ -110,6 +110,10 @@ input[type="checkbox"]:checked::after {
   animation: spin-slow 4s linear infinite;
 }
 
+.vinyl-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+
 /* Pulse glow for loading */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; }

@@ -6,6 +6,7 @@ import type { Track, Playlist } from '../services/types'
 import SearchBar from './SearchBar'
 import TrackList from './TrackList'
 import SettingsModal from './SettingsModal'
+import LandingPage from './LandingPage'
 
 const SELECTED_PLAYLISTS_KEY = 'dikta_selected_playlists'
 
@@ -124,6 +125,10 @@ export default function App() {
     )
   }
 
+  if (!isSignedIn) {
+    return <LandingPage onSignIn={signIn} />
+  }
+
   const handleSearch = (query: string) => {
     setHasSearched(true)
     setError(null)
@@ -182,27 +187,7 @@ export default function App() {
       {/* Main content */}
       <main className="flex-1 w-full max-w-2xl mx-auto px-8 py-10 pb-28">
         <AnimatePresence mode="wait">
-          {!isSignedIn ? (
-            <motion.div
-              key="login"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center pt-24"
-            >
-              <VinylIcon className="w-20 h-20 text-amber-dim mb-8" />
-              <p className="text-text-secondary text-center max-w-sm mb-10 font-light leading-relaxed">
-                Search across your YouTube playlists to find if you already know an artist or track.
-              </p>
-              <button
-                onClick={signIn}
-                className="px-8 py-3.5 bg-amber-warm text-black font-medium rounded-xl hover:bg-amber-glow transition-all duration-300 text-sm tracking-wide uppercase"
-              >
-                Sign in with Google
-              </button>
-            </motion.div>
-          ) : !isReady ? (
+          {!isReady ? (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
@@ -257,9 +242,9 @@ export default function App() {
         <span className="mx-2 text-border-warm">/</span>
         <span>For more features, try also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/privacy" className="hover:text-amber-warm transition-colors duration-200">Privacy</a>
+        <a href="/privacy" className="hover:text-amber-warm transition-colors duration-200">Privacy Policy</a>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/terms" className="hover:text-amber-warm transition-colors duration-200">Terms</a>
+        <a href="/terms" className="hover:text-amber-warm transition-colors duration-200">Terms and Agreements</a>
       </footer>
 
       <SettingsModal
