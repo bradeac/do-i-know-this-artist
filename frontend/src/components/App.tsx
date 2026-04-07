@@ -9,6 +9,8 @@ import SettingsModal from './SettingsModal'
 import LandingPage from './LandingPage'
 
 const SELECTED_PLAYLISTS_KEY = 'dikta_selected_playlists'
+const TRACK_CACHE_KEY = 'dikta_track_cache'
+const PLAYLISTS_KEY = 'dikta_playlists'
 
 function loadSelectedIds(): string[] | null {
   try {
@@ -21,6 +23,37 @@ function loadSelectedIds(): string[] | null {
 
 function saveSelectedIds(ids: string[]) {
   localStorage.setItem(SELECTED_PLAYLISTS_KEY, JSON.stringify(ids))
+}
+
+function loadTrackCache(): Map<string, Track[]> {
+  try {
+    const raw = localStorage.getItem(TRACK_CACHE_KEY)
+    if (!raw) return new Map()
+    return new Map(JSON.parse(raw))
+  } catch {
+    return new Map()
+  }
+}
+
+function saveTrackCache(cache: Map<string, Track[]>) {
+  try {
+    localStorage.setItem(TRACK_CACHE_KEY, JSON.stringify([...cache.entries()]))
+  } catch {
+    // localStorage might be full, silently fail
+  }
+}
+
+function loadPlaylists(): Playlist[] {
+  try {
+    const raw = localStorage.getItem(PLAYLISTS_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function savePlaylists(playlists: Playlist[]) {
+  localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists))
 }
 
 function delay(ms: number) {
@@ -44,18 +77,19 @@ export default function App() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [playlists, setPlaylists] = useState<Playlist[]>([])
-  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>([])
+  const [playlists, setPlaylists] = useState<Playlist[]>(loadPlaylists)
+  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>(() => loadSelectedIds() || [])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [loadingProgress, setLoadingProgress] = useState('')
-  const [isReady, setIsReady] = useState(false)
+  const [isReady, setIsReady] = useState(() => loadTrackCache().size > 0)
 
   // Cache: all tracks per playlist, keyed by playlist id
-  const trackCache = useRef<Map<string, Track[]>>(new Map())
+  const trackCache = useRef<Map<string, Track[]>>(loadTrackCache())
 
-  // Fetch playlists + all tracks on sign-in
+  // Fetch playlists + all tracks on sign-in (skip if cache exists)
   useEffect(() => {
     if (!isSignedIn || !accessToken) return
+    if (trackCache.current.size > 0) return
 
     let cancelled = false
 
@@ -66,6 +100,7 @@ export default function App() {
         if (cancelled) return
 
         setPlaylists(fetched)
+        savePlaylists(fetched)
         const saved = loadSelectedIds()
         const selectedIds = saved
           ? saved.filter((id) => fetched.some((p) => p.id === id))
@@ -93,6 +128,7 @@ export default function App() {
         }
 
         if (!cancelled) {
+          saveTrackCache(trackCache.current)
           setIsReady(true)
           setLoadingProgress('')
           // Show settings on first login so user can pick playlists
