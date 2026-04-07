@@ -1,14 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { initGoogleAuth, requestAccessToken } from '../auth/google'
 import type { GoogleUser } from '../auth/google'
-
-interface AuthState {
-  isSignedIn: boolean
-  accessToken: string | null
-  user: GoogleUser | null
-  signIn: () => void
-  isLoading: boolean
-}
+import { AuthContext } from './AuthContext'
 
 const TOKEN_KEY = 'dikta_token'
 const USER_KEY = 'dikta_user'
@@ -45,24 +38,15 @@ function saveAuth(accessToken: string, user: GoogleUser, expiresInSeconds: numbe
   localStorage.setItem(USER_KEY, JSON.stringify(user))
 }
 
-const AuthContext = createContext<AuthState>({
-  isSignedIn: false,
-  accessToken: null,
-  user: null,
-  signIn: () => {},
-  isLoading: true,
-})
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(loadToken)
   const [user, setUser] = useState<GoogleUser | null>(loadUser)
-  const [isLoading, setIsLoading] = useState(true)
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  const [isLoading, setIsLoading] = useState(!!clientId)
 
   useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
     if (!clientId) {
       console.error('VITE_GOOGLE_CLIENT_ID not set')
-      setIsLoading(false)
       return
     }
 
@@ -111,8 +95,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   )
-}
-
-export function useAuth() {
-  return useContext(AuthContext)
 }
