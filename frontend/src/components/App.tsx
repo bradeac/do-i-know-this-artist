@@ -1,43 +1,43 @@
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import { useAuth } from '../context/AuthContext'
-import { youtubeProvider } from '../services/youtube'
-import type { Track, Playlist } from '../services/types'
-import SearchBar from './SearchBar'
-import TrackList from './TrackList'
-import SettingsModal from './SettingsModal'
-import LandingPage from './LandingPage'
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "../context/AuthContext";
+import { youtubeProvider } from "../services/youtube";
+import type { Track, Playlist } from "../services/types";
+import SearchBar from "./SearchBar";
+import TrackList from "./TrackList";
+import SettingsModal from "./SettingsModal";
+import LandingPage from "./LandingPage";
 
-const SELECTED_PLAYLISTS_KEY = 'dikta_selected_playlists'
-const TRACK_CACHE_KEY = 'dikta_track_cache'
-const PLAYLISTS_KEY = 'dikta_playlists'
+const SELECTED_PLAYLISTS_KEY = "dikta_selected_playlists";
+const TRACK_CACHE_KEY = "dikta_track_cache";
+const PLAYLISTS_KEY = "dikta_playlists";
 
 function loadSelectedIds(): string[] | null {
   try {
-    const raw = localStorage.getItem(SELECTED_PLAYLISTS_KEY)
-    return raw ? JSON.parse(raw) : null
+    const raw = localStorage.getItem(SELECTED_PLAYLISTS_KEY);
+    return raw ? JSON.parse(raw) : null;
   } catch {
-    return null
+    return null;
   }
 }
 
 function saveSelectedIds(ids: string[]) {
-  localStorage.setItem(SELECTED_PLAYLISTS_KEY, JSON.stringify(ids))
+  localStorage.setItem(SELECTED_PLAYLISTS_KEY, JSON.stringify(ids));
 }
 
 function loadTrackCache(): Map<string, Track[]> {
   try {
-    const raw = localStorage.getItem(TRACK_CACHE_KEY)
-    if (!raw) return new Map()
-    return new Map(JSON.parse(raw))
+    const raw = localStorage.getItem(TRACK_CACHE_KEY);
+    if (!raw) return new Map();
+    return new Map(JSON.parse(raw));
   } catch {
-    return new Map()
+    return new Map();
   }
 }
 
 function saveTrackCache(cache: Map<string, Track[]>) {
   try {
-    localStorage.setItem(TRACK_CACHE_KEY, JSON.stringify([...cache.entries()]))
+    localStorage.setItem(TRACK_CACHE_KEY, JSON.stringify([...cache.entries()]));
   } catch {
     // localStorage might be full, silently fail
   }
@@ -45,144 +45,200 @@ function saveTrackCache(cache: Map<string, Track[]>) {
 
 function loadPlaylists(): Playlist[] {
   try {
-    const raw = localStorage.getItem(PLAYLISTS_KEY)
-    return raw ? JSON.parse(raw) : []
+    const raw = localStorage.getItem(PLAYLISTS_KEY);
+    return raw ? JSON.parse(raw) : [];
   } catch {
-    return []
+    return [];
   }
 }
 
 function savePlaylists(playlists: Playlist[]) {
-  localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists))
+  localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists));
 }
 
 function delay(ms: number) {
-  return new Promise((r) => setTimeout(r, ms))
+  return new Promise((r) => setTimeout(r, ms));
 }
 
-function VinylIcon({ className = '' }: { className?: string }) {
+function VinylIcon({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="48" stroke="currentColor" strokeWidth="1" opacity="0.3" />
-      <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="0.5" opacity="0.2" />
-      <circle cx="50" cy="50" r="28" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
-      <circle cx="50" cy="50" r="15" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+    <svg
+      viewBox="0 0 100 100"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="50"
+        cy="50"
+        r="48"
+        stroke="currentColor"
+        strokeWidth="1"
+        opacity="0.3"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="38"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.2"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="28"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.15"
+      />
+      <circle
+        cx="50"
+        cy="50"
+        r="15"
+        stroke="currentColor"
+        strokeWidth="1"
+        opacity="0.3"
+      />
       <circle cx="50" cy="50" r="4" fill="currentColor" opacity="0.4" />
     </svg>
-  )
+  );
 }
 
 export default function App() {
-  const { isSignedIn, accessToken, user, signIn, isLoading: authLoading } = useAuth()
-  const [tracks, setTracks] = useState<Track[]>([])
-  const [hasSearched, setHasSearched] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [playlists, setPlaylists] = useState<Playlist[]>(loadPlaylists)
-  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>(() => loadSelectedIds() || [])
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [loadingProgress, setLoadingProgress] = useState('')
-  const [isReady, setIsReady] = useState(() => loadTrackCache().size > 0)
+  const {
+    isSignedIn,
+    accessToken,
+    user,
+    signIn,
+    isLoading: authLoading,
+  } = useAuth();
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [playlists, setPlaylists] = useState<Playlist[]>(loadPlaylists);
+  const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<string[]>(
+    () => loadSelectedIds() || [],
+  );
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState("");
+  const [isReady, setIsReady] = useState(() => loadTrackCache().size > 0);
 
   // Cache: all tracks per playlist, keyed by playlist id
-  const trackCache = useRef<Map<string, Track[]>>(loadTrackCache())
+  const trackCache = useRef<Map<string, Track[]>>(loadTrackCache());
 
   // Fetch playlists + all tracks on sign-in (skip if cache exists)
   useEffect(() => {
-    if (!isSignedIn || !accessToken) return
-    if (trackCache.current.size > 0) return
+    if (!isSignedIn || !accessToken) return;
+    if (trackCache.current.size > 0) return;
 
-    let cancelled = false
+    let cancelled = false;
 
     async function loadEverything() {
       try {
-        setLoadingProgress('Loading playlists...')
-        const fetched = await youtubeProvider.getPlaylists(accessToken!)
-        if (cancelled) return
+        setLoadingProgress("Loading playlists...");
+        const fetched = await youtubeProvider.getPlaylists(accessToken!);
+        if (cancelled) return;
 
-        setPlaylists(fetched)
-        savePlaylists(fetched)
-        const saved = loadSelectedIds()
+        setPlaylists(fetched);
+        savePlaylists(fetched);
+        const saved = loadSelectedIds();
         const selectedIds = saved
           ? saved.filter((id) => fetched.some((p) => p.id === id))
-          : fetched.map((p) => p.id)
-        setSelectedPlaylistIds(selectedIds)
+          : fetched.map((p) => p.id);
+        setSelectedPlaylistIds(selectedIds);
 
         // Fetch tracks for all playlists with delay to avoid rate limiting
         for (let i = 0; i < fetched.length; i++) {
-          if (cancelled) return
-          const playlist = fetched[i]
-          setLoadingProgress(`Loading tracks: ${playlist.title} (${i + 1}/${fetched.length})`)
+          if (cancelled) return;
+          const playlist = fetched[i];
+          setLoadingProgress(
+            `Loading tracks: ${playlist.title} (${i + 1}/${fetched.length})`,
+          );
 
           try {
-            const playlistTracks = await youtubeProvider.getTracks(playlist.id, accessToken!)
-            trackCache.current.set(playlist.id, playlistTracks.map((t) => ({ ...t, playlistName: playlist.title })))
+            const playlistTracks = await youtubeProvider.getTracks(
+              playlist.id,
+              accessToken!,
+            );
+            trackCache.current.set(
+              playlist.id,
+              playlistTracks.map((t) => ({
+                ...t,
+                playlistName: playlist.title,
+              })),
+            );
           } catch {
             // Skip playlists that fail, don't break the whole load
-            trackCache.current.set(playlist.id, [])
+            trackCache.current.set(playlist.id, []);
           }
 
           // Small delay between requests to avoid rate limiting
           if (i < fetched.length - 1) {
-            await delay(200)
+            await delay(200);
           }
         }
 
         if (!cancelled) {
-          saveTrackCache(trackCache.current)
-          setIsReady(true)
-          setLoadingProgress('')
+          saveTrackCache(trackCache.current);
+          setIsReady(true);
+          setLoadingProgress("");
           // Show settings on first login so user can pick playlists
           if (!saved) {
-            setSettingsOpen(true)
+            setSettingsOpen(true);
           }
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load data')
-          setLoadingProgress('')
+          setError(err instanceof Error ? err.message : "Failed to load data");
+          setLoadingProgress("");
         }
       }
     }
 
-    loadEverything()
-    return () => { cancelled = true }
-  }, [isSignedIn, accessToken])
+    loadEverything();
+    return () => {
+      cancelled = true;
+    };
+  }, [isSignedIn, accessToken]);
 
   const handleSelectionChange = (ids: string[]) => {
-    setSelectedPlaylistIds(ids)
-    saveSelectedIds(ids)
-  }
+    setSelectedPlaylistIds(ids);
+    saveSelectedIds(ids);
+  };
 
   if (authLoading) {
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
         <VinylIcon className="w-16 h-16 text-amber-warm vinyl-spin" />
       </div>
-    )
+    );
   }
 
   if (!isSignedIn) {
-    return <LandingPage onSignIn={signIn} />
+    return <LandingPage onSignIn={signIn} />;
   }
 
   const handleSearch = (query: string) => {
-    setHasSearched(true)
-    setError(null)
+    setHasSearched(true);
+    setError(null);
 
-    const q = query.toLowerCase()
-    const results: Track[] = []
+    const q = query.toLowerCase();
+    const results: Track[] = [];
 
     for (const playlistId of selectedPlaylistIds) {
-      const cached = trackCache.current.get(playlistId)
-      if (!cached) continue
+      const cached = trackCache.current.get(playlistId);
+      if (!cached) continue;
       const matched = cached.filter(
-        (t) => t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q)
-      )
-      results.push(...matched)
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.artist.toLowerCase().includes(q),
+      );
+      results.push(...matched);
     }
 
-    setTracks(results)
-  }
+    setTracks(results);
+  };
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
@@ -205,14 +261,27 @@ export default function App() {
               transition={{ delay: 0.2 }}
               className="flex items-center gap-4"
             >
-              <span className="text-text-muted text-xs hidden sm:inline">{user?.name}</span>
+              <span className="text-text-muted text-xs hidden sm:inline">
+                {user?.name}
+              </span>
               <button
                 onClick={() => setSettingsOpen(true)}
                 className="text-text-muted hover:text-amber-warm transition-colors p-2 rounded-lg hover:bg-surface-raised"
                 aria-label="Settings"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
+                  />
                 </svg>
               </button>
             </motion.div>
@@ -261,7 +330,8 @@ export default function App() {
                       animate={{ opacity: 1 }}
                       className="text-text-muted text-xs mb-6 tracking-wide uppercase"
                     >
-                      {tracks.length} {tracks.length === 1 ? 'result' : 'results'} found
+                      {tracks.length}{" "}
+                      {tracks.length === 1 ? "result" : "results"} found
                     </motion.p>
                   )}
                   <TrackList tracks={tracks} />
@@ -274,13 +344,41 @@ export default function App() {
 
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-sm border-t border-border-subtle py-3 text-center text-xs text-text-secondary">
-        <span>Built by </span><a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">bradeac.dev</a>
+        <span>Built by </span>
+        <a
+          href="https://bradeac.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-amber-warm transition-colors duration-200"
+        >
+          bradeac.dev
+        </a>
         <span className="mx-2 text-border-warm">/</span>
-        <span>For more features, try also <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="hover:text-amber-warm transition-colors duration-200">music.bradeac.dev</a></span>
+        <span>
+          For more features, try also{" "}
+          <a
+            href="https://permamusic.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-amber-warm transition-colors duration-200"
+          >
+            permamusic.app
+          </a>
+        </span>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/privacy" className="hover:text-amber-warm transition-colors duration-200">Privacy Policy</a>
+        <a
+          href="/privacy"
+          className="hover:text-amber-warm transition-colors duration-200"
+        >
+          Privacy Policy
+        </a>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/terms" className="hover:text-amber-warm transition-colors duration-200">Terms and Agreements</a>
+        <a
+          href="/terms"
+          className="hover:text-amber-warm transition-colors duration-200"
+        >
+          Terms and Agreements
+        </a>
       </footer>
 
       <SettingsModal
@@ -291,5 +389,5 @@ export default function App() {
         onSelectionChange={handleSelectionChange}
       />
     </div>
-  )
+  );
 }

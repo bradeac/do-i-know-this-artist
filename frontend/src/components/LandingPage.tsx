@@ -1,24 +1,85 @@
-import { motion } from 'motion/react'
+import { motion } from "motion/react";
 
 interface LandingPageProps {
-  onSignIn: () => void
+  onSignIn: () => void;
 }
 
-function VinylRecord({ className = '' }: { className?: string }) {
+function VinylRecord({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 400 400" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="200" cy="200" r="195" stroke="currentColor" strokeWidth="0.5" opacity="0.12" />
-      <circle cx="200" cy="200" r="170" stroke="currentColor" strokeWidth="0.3" opacity="0.08" />
-      <circle cx="200" cy="200" r="155" stroke="currentColor" strokeWidth="0.3" opacity="0.06" />
-      <circle cx="200" cy="200" r="140" stroke="currentColor" strokeWidth="0.3" opacity="0.08" />
-      <circle cx="200" cy="200" r="120" stroke="currentColor" strokeWidth="0.3" opacity="0.06" />
-      <circle cx="200" cy="200" r="100" stroke="currentColor" strokeWidth="0.3" opacity="0.08" />
-      <circle cx="200" cy="200" r="80" stroke="currentColor" strokeWidth="0.5" opacity="0.1" />
-      <circle cx="200" cy="200" r="55" stroke="currentColor" strokeWidth="0.5" opacity="0.15" />
+    <svg
+      viewBox="0 0 400 400"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="200"
+        cy="200"
+        r="195"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.12"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="170"
+        stroke="currentColor"
+        strokeWidth="0.3"
+        opacity="0.08"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="155"
+        stroke="currentColor"
+        strokeWidth="0.3"
+        opacity="0.06"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="140"
+        stroke="currentColor"
+        strokeWidth="0.3"
+        opacity="0.08"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="120"
+        stroke="currentColor"
+        strokeWidth="0.3"
+        opacity="0.06"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="100"
+        stroke="currentColor"
+        strokeWidth="0.3"
+        opacity="0.08"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="80"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.1"
+      />
+      <circle
+        cx="200"
+        cy="200"
+        r="55"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.15"
+      />
       <circle cx="200" cy="200" r="20" fill="currentColor" opacity="0.08" />
       <circle cx="200" cy="200" r="6" fill="currentColor" opacity="0.2" />
     </svg>
-  )
+  );
 }
 
 function StepNumber({ n }: { n: number }) {
@@ -26,13 +87,12 @@ function StepNumber({ n }: { n: number }) {
     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-amber-warm/30 text-amber-warm text-xs font-medium shrink-0">
       {n}
     </span>
-  )
+  );
 }
 
 export default function LandingPage({ onSignIn }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-surface flex flex-col">
-
       {/* Hero */}
       <section className="relative w-full overflow-hidden">
         {/* Background vinyl */}
@@ -48,7 +108,9 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
           >
             <div className="w-8 h-0.5 bg-amber-warm mb-8" />
             <h1 className="font-display text-5xl sm:text-6xl tracking-wider text-text-primary uppercase leading-tight">
-              Do I Know<br />This Artist?
+              Do I Know
+              <br />
+              This Artist?
             </h1>
           </motion.div>
 
@@ -58,7 +120,8 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
             transition={{ duration: 0.5, delay: 0.15 }}
             className="mt-6 text-text-secondary text-lg font-light leading-relaxed max-w-md"
           >
-            Search across all your YouTube playlists to instantly find if you already know an artist or track.
+            Search across all your YouTube playlists to instantly find if you
+            already know an artist or track.
           </motion.p>
 
           <motion.button
@@ -85,10 +148,12 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-4">Why</p>
+          <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-4">
+            Why
+          </p>
           <p className="text-text-secondary font-light leading-relaxed max-w-lg">
-            You spot a name on a festival lineup and it sounds familiar.
-            Or you remember saving a song somewhere but can't find which playlist.
+            You spot a name on a festival lineup and it sounds familiar. Or you
+            remember saving a song somewhere but can't find which playlist.
             Instead of scrolling through dozens of playlists — just search.
           </p>
         </motion.div>
@@ -106,30 +171,46 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-8">How it works</p>
+          <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-8">
+            How it works
+          </p>
 
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <StepNumber n={1} />
               <div>
-                <p className="text-text-primary text-sm font-medium">Connect your YouTube</p>
-                <p className="text-text-secondary text-sm font-light mt-1">Sign in with Google for read-only access to your playlists.</p>
+                <p className="text-text-primary text-sm font-medium">
+                  Connect your YouTube
+                </p>
+                <p className="text-text-secondary text-sm font-light mt-1">
+                  Sign in with Google for read-only access to your playlists.
+                </p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
               <StepNumber n={2} />
               <div>
-                <p className="text-text-primary text-sm font-medium">Tracks are cached locally</p>
-                <p className="text-text-secondary text-sm font-light mt-1">All your tracks are loaded once and stored in your browser. Nothing is sent to our servers.</p>
+                <p className="text-text-primary text-sm font-medium">
+                  Tracks are cached locally
+                </p>
+                <p className="text-text-secondary text-sm font-light mt-1">
+                  All your tracks are loaded once and stored in your browser.
+                  Nothing is sent to our servers.
+                </p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
               <StepNumber n={3} />
               <div>
-                <p className="text-text-primary text-sm font-medium">Search instantly</p>
-                <p className="text-text-secondary text-sm font-light mt-1">Type an artist or track name and get results across all your playlists.</p>
+                <p className="text-text-primary text-sm font-medium">
+                  Search instantly
+                </p>
+                <p className="text-text-secondary text-sm font-light mt-1">
+                  Type an artist or track name and get results across all your
+                  playlists.
+                </p>
               </div>
             </div>
           </div>
@@ -150,10 +231,19 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
           className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8"
         >
           <div>
-            <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-4">Privacy</p>
+            <p className="text-text-muted text-[10px] tracking-[0.25em] uppercase mb-4">
+              Privacy
+            </p>
             <p className="text-text-secondary text-sm font-light leading-relaxed max-w-sm">
-              Your data never leaves your browser. We request read-only access and store nothing on our servers.
-              Read our <a href="/privacy" className="text-amber-warm hover:text-amber-glow transition-colors">privacy policy</a>.
+              Your data never leaves your browser. We request read-only access
+              and store nothing on our servers. Read our{" "}
+              <a
+                href="/privacy"
+                className="text-amber-warm hover:text-amber-glow transition-colors"
+              >
+                privacy policy
+              </a>
+              .
             </p>
           </div>
 
@@ -169,15 +259,33 @@ export default function LandingPage({ onSignIn }: LandingPageProps) {
       {/* Footer */}
       <footer className="mt-auto border-t border-border-subtle py-6 text-center text-xs text-text-secondary">
         <span>Built by </span>
-        <a href="https://bradeac.dev" target="_blank" rel="noopener noreferrer" className="text-amber-warm hover:text-amber-glow transition-colors">bradeac.dev</a>
+        <a
+          href="https://bradeac.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-warm hover:text-amber-glow transition-colors"
+        >
+          bradeac.dev
+        </a>
         <span className="mx-2 text-border-warm">/</span>
         <span>For more features, try also </span>
-        <a href="https://music.bradeac.dev" target="_blank" rel="noopener noreferrer" className="text-amber-warm hover:text-amber-glow transition-colors">music.bradeac.dev</a>
+        <a
+          href="https://permamusic.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-warm hover:text-amber-glow transition-colors"
+        >
+          permamusic.app
+        </a>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/privacy" className="hover:text-amber-warm transition-colors">Privacy Policy</a>
+        <a href="/privacy" className="hover:text-amber-warm transition-colors">
+          Privacy Policy
+        </a>
         <span className="mx-2 text-border-warm">/</span>
-        <a href="/terms" className="hover:text-amber-warm transition-colors">Terms and Agreements</a>
+        <a href="/terms" className="hover:text-amber-warm transition-colors">
+          Terms and Agreements
+        </a>
       </footer>
     </div>
-  )
+  );
 }
