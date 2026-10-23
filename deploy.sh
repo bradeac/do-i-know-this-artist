@@ -43,7 +43,7 @@ ENDSSH
 rm backend.tar.gz frontend.tar.gz
 
 echo "Checking running containers..."
-# Local checks (the heredoc above has no set -e): fail the deploy on a vulnerable Node or a dev-mode backend.
+# Confirm on the live containers: fail the deploy on a vulnerable Node or a dev-mode backend.
 for c in dikta-backend dikta-frontend; do
   v=$(ssh h "docker exec $c node -v")
   echo "$c: node $v"
