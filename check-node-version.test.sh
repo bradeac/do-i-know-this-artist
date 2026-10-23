@@ -13,6 +13,7 @@ expect 0 v22.23.4
 expect 0 v22.24.0
 expect 0 v22.100.0
 expect 1 v24.22.1   # other majors are not accepted
+expect 1 v22.23.4foo   # sort -V alone would let this through
 expect 1 ""
 expect 1 "not-a-version"
 [ "$fail" -eq 0 ] && echo "ok"
