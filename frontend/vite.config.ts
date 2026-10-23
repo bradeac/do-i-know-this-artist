@@ -1,5 +1,6 @@
 
-import os from 'node:os';/// <reference types="vitest/config" />
+/// <reference types="vitest/config" />
+import os from 'node:os'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
