@@ -6,7 +6,7 @@
 set -e
 
 echo "Building images locally..."
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose -f docker-compose.prod.yml build --no-cache
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose -f docker-compose.prod.yml build --pull --no-cache
 
 echo "Saving images..."
 docker save dikta-backend:latest | gzip > backend.tar.gz
@@ -27,4 +27,19 @@ docker compose -f docker-compose.prod.yml ps
 ENDSSH
 
 rm backend.tar.gz frontend.tar.gz
+
+echo "Checking running containers..."
+# Local checks (the heredoc above has no set -e): fail the deploy on a vulnerable Node or a dev-mode backend.
+for c in dikta-backend dikta-frontend; do
+  v=$(ssh h "docker exec $c node -v")
+  echo "$c: node $v"
+  bash "$(dirname "$0")/check-node-version.sh" "$v"
+done
+cmd=$(ssh h "docker exec dikta-backend cat /proc/1/cmdline" | tr '\0' ' ')
+echo "dikta-backend PID 1: $cmd"
+case "$cmd" in
+  "node dist/index.js "*) ;;
+  *) echo "backend is not running node dist/index.js" >&2; exit 1 ;;
+esac
+
 echo "Deployment complete!"
